@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE | 3D Interactive & Business Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root { --primary: #add8e6; --secondary: #000000; }
+        body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
+        .bg-primary { background-color: var(--primary); }
+        .text-primary { color: var(--primary); }
+        .page-section { display: none; min-height: 100vh; }
+        .page-section.active { display: block; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.6; }
+        .card-3d { transition: transform 0.4s ease; transform-style: preserve-3d; }
+        .card-3d:hover { transform: perspective(1000px) rotateX(10deg) rotateY(10deg); }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.3); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-white text-black">
+
+    <nav class="fixed top-0 w-full z-[100] bg-black text-white p-5 flex justify-between items-center shadow-2xl">
+        <div class="text-2xl font-black tracking-widest text-primary cursor-pointer" onclick="showPage('home')">LUXE.</div>
+        <div class="hidden md:flex space-x-6 text-xs font-bold uppercase tracking-widest">
+            <a href="#" onclick="showPage('home')" class="hover:text-primary transition">Home</a>
+            <a href="#" onclick="showPage('about')" class="hover:text-primary transition">About</a>
+            <a href="#" onclick="showPage('services')" class="hover:text-primary transition">Services</a>
+            <a href="#" onclick="showPage('gallery')" class="hover:text-primary transition">Shop</a>
+            <a href="#" onclick="showPage('dashboard')" class="text-primary border-b border-primary">Admin</a>
+        </div>
+        <div onclick="showPage('cart')" class="cursor-pointer bg-primary text-black px-4 py-1 font-bold text-sm rounded-full transform hover:scale-110 transition">
+            CART: <span id="cart-count">0</span>
+        </div>
+    </nav>
+
+    <div id="canvas-container"></div>
+
+    <main>
+        <section id="home" class="page-section active">
+            <div class="relative h-screen flex items-center justify-center bg-black overflow-hidden">
+                <div class="z-10 text-center">
+                    <h1 class="text-white text-7xl md:text-9xl font-black italic animate__animated animate__fadeInDown">LUXE</h1>
+                    <p class="text-primary mt-4 tracking-[1em] font-light animate__animated animate__fadeInUp">ESTABLISHED 2026</p>
+                    <div class="mt-10 flex justify-center space-x-4">
+                        <button onclick="showPage('gallery')" class="px-8 py-3 bg-primary font-bold hover:bg-white transition uppercase text-xs">Shop Now</button>
+                        <button onclick="showPage('about')" class="px-8 py-3 border border-white text-white font-bold hover:bg-white hover:text-black transition uppercase text-xs">Our Story</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-20 bg-gray-50 overflow-hidden">
+                <h2 class="text-center text-sm font-bold tracking-widest mb-10 text-gray-400">FEATURED SELECTIONS</h2>
+                <div class="flex space-x-8 px-10 overflow-x-auto no-scrollbar pb-10" id="carousel-items">
+                    </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 h-[500px]">
+                <div class="bg-black text-white p-20 flex flex-col justify-center">
+                    <h2 class="text-4xl font-bold mb-6">Unrivaled Quality</h2>
+                    <p class="text-gray-400">Experience the fusion of traditional craftsmanship and futuristic design. Every piece is a testament to our commitment to excellence.</p>
+                </div>
+                <div class="bg-[url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80')] bg-cover bg-center"></div>
+            </div>
+        </section>
+
+        <section id="about" class="page-section pt-32 px-10 bg-white">
+            <div class="max-w-4xl mx-auto space-y-20">
+                <div class="text-center space-y-4">
+                    <h2 class="text-5xl font-black uppercase">We Are Luxe</h2>
+                    <p class="text-gray-500">The world's first AI-integrated fashion boutique.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-10">
+                    <div class="p-10 border-l-8 border-primary bg-gray-50">
+                        <h4 class="font-bold text-xl mb-4 italic">Sustainability</h4>
+                        <p class="text-sm leading-relaxed">Our 2026 pledge ensures that 100% of our jewelry metals are ethically sourced and recycled.</p>
+                    </div>
+                    <div class="p-10 border-l-8 border-black bg-gray-50">
+                        <h4 class="font-bold text-xl mb-4 italic">Innovation</h4>
+                        <p class="text-sm leading-relaxed">Using 3D printing technology, we create bespoke footwear that fits the unique contour of your feet.</p>
+                    </div>
+                </div>
+                <div class="h-64 bg-primary flex items-center justify-center">
+                    <span class="text-white text-4xl font-black tracking-tighter uppercase">Global Fashion. Local Impact.</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="page-section pt-32 bg-gray-50 px-10">
+            <h2 class="text-center text-4xl font-black mb-16">BEYOND RETAIL</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-12 text-center card-3d shadow-xl">
+                    <h3 class="font-bold text-2xl mb-4">Express VIP</h3>
+                    <p class="text-gray-500 text-sm mb-6">Same-day delivery in major capitals including Paris, NY, and Tokyo.</p>
+                    <span class="text-primary font-black">ACTIVE</span>
+                </div>
+                <div class="bg-black text-white p-12 text-center card-3d shadow-xl">
+                    <h3 class="font-bold text-2xl mb-4">Custom Fit</h3>
+                    <p class="text-gray-400 text-sm mb-6">Upload a 3D scan of your body for perfectly tailored suits and dresses.</p>
+                    <span class="text-primary font-black">PREMIUM</span>
+                </div>
+                <div class="bg-white p-12 text-center card-3d shadow-xl">
+                    <h3 class="font-bold text-2xl mb-4">Crypto Pay</h3>
+                    <p class="text-gray-500 text-sm mb-6">We accept all major cryptocurrencies for a decentralized shopping experience.</p>
+                    <span class="text-primary font-black">WEB3</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery" class="page-section pt-32 px-6">
+            <h2 class="text-center text-4xl font-black mb-10">THE VAULT</h2>
+            <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                </div>
+        </section>
+
+        <section id="cart" class="page-section pt-32 px-6">
+            <div class="max-w-2xl mx-auto glass-panel p-10 shadow-2xl rounded-3xl border-2 border-primary">
+                <h2 class="text-3xl font-black mb-8">SHOPPING BAG</h2>
+                <div id="cart-list" class="space-y-4 mb-8"></div>
+                <div class="flex justify-between items-center text-2xl font-bold border-t pt-6">
+                    <span>Total Cost:</span>
+                    <span id="total-price" class="text-primary bg-black px-4 py-1 rounded">$0.00</span>
+                </div>
+                <button onclick="checkout()" class="w-full mt-8 py-4 bg-primary text-black font-black hover:bg-black hover:text-white transition-all uppercase tracking-widest">Complete Order</button>
+            </div>
+        </section>
+
+        <section id="dashboard" class="page-section pt-32 px-6 bg-black text-white">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-5xl font-black text-primary mb-12">BUSINESS ANALYTICS</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-gray-900 p-8 rounded-2xl border border-gray-800">
+                        <p class="text-gray-500 uppercase text-xs font-bold mb-2">Total Sales</p>
+                        <h3 id="dash-revenue" class="text-4xl font-black">$0.00</h3>
+                    </div>
+                    <div class="bg-gray-900 p-8 rounded-2xl border border-gray-800">
+                        <p class="text-gray-500 uppercase text-xs font-bold mb-2">Orders Processed</p>
+                        <h3 id="dash-orders" class="text-4xl font-black">0</h3>
+                    </div>
+                    <div class="bg-gray-900 p-8 rounded-2xl border border-gray-800">
+                        <p class="text-gray-500 uppercase text-xs font-bold mb-2">Inventory Items</p>
+                        <h3 class="text-4xl font-black">55</h3>
+                    </div>
+                </div>
+                <div class="bg-gray-900 p-8 rounded-2xl border border-gray-800">
+                    <h4 class="font-bold mb-6">Recent Transactions</h4>
+                    <div id="sales-history" class="space-y-3">
+                        <p class="text-gray-600">No sales data recorded yet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-black text-white py-20 px-10 border-t border-gray-800 mt-20">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-20">
+            <div>
+                <h3 class="text-primary text-2xl font-black mb-6">LUXE.</h3>
+                <p class="text-gray-500 text-sm leading-relaxed">Premium clothing, jewelry, and footwear curated for the modern digital era.</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-6 text-primary">Connect</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm text-gray-400">
+                    <a href="#" class="hover:text-white transition">Instagram</a>
+                    <a href="#" class="hover:text-white transition">TikTok</a>
+                    <a href="#" class="hover:text-white transition">LinkedIn</a>
+                    <a href="#" class="hover:text-white transition">Twitter</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold mb-6 text-primary">Newsletter</h4>
+                <div class="flex">
+                    <input type="text" placeholder="Email" class="bg-gray-900 p-3 w-full text-white outline-none">
+                    <button class="bg-primary text-black px-6 font-bold">JOIN</button>
+                </div>
+            </div>
+        </div>
+        <p class="text-center mt-20 text-xs text-gray-700 uppercase tracking-widest">&copy; 2026 LUXE ECOMMERCE SYSTEM | DESIGNED BY Tommy</p>
+    </footer>
+
+    <script>
+        // --- DATA ---
+        const products = [];
+        const categories = ['Jewelry', 'Sneakers', 'Timepiece', 'Suit', 'Heels', 'Clutch'];
+        const images = [
+            'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400',
+            'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400',
+            'https://images.unsplash.com/photo-1523170335258-f5ed11844a1e?w=400',
+            'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400',
+            'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400',
+            'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400'
+        ];
+
+        for(let i=1; i<=55; i++){
+            products.push({
+                id: i,
+                name: `Luxe ${categories[i%6]} ${i}`,
+                price: (Math.random() * 800 + 100).toFixed(2),
+                img: images[i%6]
+            });
+        }
+
+        let cart = JSON.parse(localStorage.getItem('luxe_cart')) || [];
+        let salesHistory = JSON.parse(localStorage.getItem('luxe_sales')) || [];
+
+        // --- 3D ENGINE ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const geo = new THREE.IcosahedronGeometry(15, 1);
+        const mat = new THREE.MeshBasicMaterial({ color: 0xadd8e6, wireframe: true });
+        const mesh = new THREE.Mesh(geo, mat);
+        scene.add(mesh);
+        camera.position.z = 40;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            mesh.rotation.y += 0.002;
+            mesh.rotation.x += 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- BUSINESS LOGIC ---
+        function showPage(id) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0,0);
+            if(id === 'dashboard') updateDashboard();
+        }
+
+        function renderAll() {
+            const grid = document.getElementById('product-grid');
+            const carousel = document.getElementById('carousel-items');
+
+            grid.innerHTML = products.map(p => `
+                <div class="card-3d bg-white p-4 border border-gray-100 group relative">
+                    <img src="${p.img}" class="w-full h-72 object-cover mb-4">
+                    <h3 class="font-bold text-sm uppercase">${p.name}</h3>
+                    <p class="text-primary font-bold">$${p.price}</p>
+                    <button onclick="addToCart(${p.id})" class="mt-4 w-full bg-black text-white py-2 text-xs font-bold hover:bg-primary hover:text-black transition">ADD TO BAG</button>
+                </div>
+            `).join('');
+
+            carousel.innerHTML = products.slice(0, 10).map(p => `
+                <div class="min-w-[280px] bg-white p-2 shadow-lg">
+                    <img src="${p.img}" class="w-full h-64 object-cover">
+                    <p class="mt-2 font-black text-xs">${p.name}</p>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            cart.push(products.find(p => p.id === id));
+            save();
+            updateUI();
+        }
+
+        function checkout() {
+            if(cart.length === 0) return alert("Bag is empty");
+            const total = cart.reduce((acc, item) => acc + parseFloat(item.price), 0);
+            const order = {
+                id: Date.now(),
+                amount: total.toFixed(2),
+                items: cart.length,
+                date: new Date().toLocaleString()
+            };
+            salesHistory.push(order);
+            localStorage.setItem('luxe_sales', JSON.stringify(salesHistory));
+            cart = [];
+            save();
+            updateUI();
+            alert("Order Confirmed! Business Dashboard Updated.");
+            showPage('home');
+        }
+
+        function updateDashboard() {
+            const totalRev = salesHistory.reduce((acc, s) => acc + parseFloat(s.amount), 0);
+            document.getElementById('dash-revenue').innerText = `$${totalRev.toFixed(2)}`;
+            document.getElementById('dash-orders').innerText = salesHistory.length;
+            
+            const historyDiv = document.getElementById('sales-history');
+            if(salesHistory.length > 0) {
+                historyDiv.innerHTML = salesHistory.slice().reverse().map(s => `
+                    <div class="flex justify-between p-3 bg-black rounded text-xs">
+                        <span>Order #${s.id} - ${s.items} Items</span>
+                        <span class="text-primary font-bold">+$${s.amount}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('cart-count').innerText = cart.length;
+            const list = document.getElementById('cart-list');
+            const totalP = document.getElementById('total-price');
+            let total = 0;
+            list.innerHTML = cart.map((c, i) => {
+                total += parseFloat(c.price);
+                return `<div class="flex justify-between text-sm"><span>${c.name}</span><b>$${c.price}</b></div>`;
+            }).join('');
+            totalP.innerText = `$${total.toFixed(2)}`;
+        }
+
+        function save() { localStorage.setItem('luxe_cart', JSON.stringify(cart)); }
+
+        window.onload = () => { renderAll(); updateUI(); };
+    </script>
+</body>
+</html>
